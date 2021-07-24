@@ -1,25 +1,63 @@
-import React from 'react';
-import './App.css';
-import RecipeMeta from './Components/RecipeMeta';
-import RecipeIngredients from './Components/RecipeIngredients';
-import RecipeSteps from './Components/RecipeSteps';
-import recipeData from './recipeData'
+import React from "react"
+import "antd/dist/antd.css"
+import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom"
+import RecipesProvider from "./Context/RecipesContext"
+import RecipeList from "./Pages/RecipeList"
+import MainModal from "./Components/MainModal"
+import { GlobalStyle } from "./Themes/global"
+import lightTheme from "./Themes/light"
+import { ThemeProvider } from "styled-components"
+import { Button, Layout } from "antd"
+import { PlusOutlined, ReloadOutlined } from "@ant-design/icons"
+import { AppContainer, RecipeHeader, NavContainer } from "./style"
+const { Content } = Layout
 
-function App() {
-
-  const recipe = recipeData()
-
-  return (
-    <div className="App">
-      <RecipeMeta 
-        title={recipe.title} 
-        time={recipe.timeToMake} 
-        servings={recipe.servings} 
-      />
-      <RecipeIngredients ingredients={recipe.ingredients} />
-      <RecipeSteps steps={recipe.steps} /> 
-    </div>
-  );
+const onReset = () => {
+  localStorage.removeItem("interview-recipes")
+  window.location.reload()
 }
 
-export default App;
+function App() {
+  return (
+    <Router>
+      <ThemeProvider theme={lightTheme}>
+        <GlobalStyle />
+        <RecipesProvider>
+          <Layout>
+            <RecipeHeader>
+              <NavContainer>
+                <Button
+                  onClick={onReset}
+                  type="primary"
+                  shape="round"
+                  icon={<ReloadOutlined />}
+                >
+                  Restart
+                </Button>{" "}
+                <Link to="/add">
+                  <Button type="primary" shape="round" icon={<PlusOutlined />}>
+                    Add Recipe
+                  </Button>
+                </Link>
+              </NavContainer>
+            </RecipeHeader>
+            <Content>
+              <AppContainer>
+                <Switch>
+                  <Route path="/">
+                    <RecipeList />
+                  </Route>
+                </Switch>
+                <Route path="/add">
+                  <MainModal />
+                </Route>
+              </AppContainer>
+            </Content>
+          </Layout>
+        </RecipesProvider>
+      </ThemeProvider>
+    </Router>
+  )
+}
+
+export default App
